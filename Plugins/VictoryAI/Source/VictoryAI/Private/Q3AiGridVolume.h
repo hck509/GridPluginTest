@@ -12,8 +12,10 @@ UCLASS()
 class VICTORYAI_API AQ3AiGridVolume : public AVolume
 {
 	GENERATED_BODY()
-	
-	
-	
-	
+
+public:
+    AQ3AiGridVolume(const FObjectInitializer& ObjectInitializer);
+
+     virtual void Tick(float DeltaSeconds) override;
+     virtual void PostRenderFor(class APlayerController* PC, class UCanvas* Canvas, FVector CameraPosition, FVector CameraDir) override;
 };
