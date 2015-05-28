@@ -1,0 +1,25 @@
+{
+	"PluginFileVersion" : 1,
+
+	"FriendlyName" : "Victory AI",
+	"Version" : 1,
+	"VersionName" : "1.0",
+	"CreatedBy" : "Rama", 
+	"CreatedByURL" : "https://forums.unrealengine.com/showthread.php?299-Wiki-Code-Tutorials",
+	"EngineVersion" : 1579795,
+	"Description" : "Rama's AI BP Nodes and CPP Classes",
+	"Category" : "Victory AI Plugin",
+	"EnabledByDefault" : true,
+	
+	"Modules" :
+	[		
+		{
+			"Name" : "VictoryAI",
+			"Type" : "Runtime",
+			"LoadingPhase" : "PreDefault",
+			"WhitelistPlatforms" : [ "Win64", "Win32", "Mac" ]
+		},
+
+		
+	]
+}
