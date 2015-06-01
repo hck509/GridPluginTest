@@ -25,3 +25,13 @@ void AQ3AiGridVolume::PostRenderFor(class APlayerController* PC, class UCanvas* 
 {
 
 }
+
+void AQ3AiGridVolume::BuildGrid()
+{
+	FBoxSphereBounds Bounds = BrushComponent->CalcBounds(BrushComponent->ComponentToWorld);
+	FBox BBox = Bounds.GetBox();
+
+	const float Step = 50.0f;
+	
+
+}

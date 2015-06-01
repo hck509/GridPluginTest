@@ -18,4 +18,6 @@ public:
 
      virtual void Tick(float DeltaSeconds) override;
      virtual void PostRenderFor(class APlayerController* PC, class UCanvas* Canvas, FVector CameraPosition, FVector CameraDir) override;
+
+	 void BuildGrid();
 };
