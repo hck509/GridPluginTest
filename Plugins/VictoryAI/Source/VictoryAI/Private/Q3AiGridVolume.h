@@ -6,7 +6,7 @@
 #include "Q3AiGridVolume.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class VICTORYAI_API AQ3AiGridVolume : public AVolume
@@ -14,10 +14,13 @@ class VICTORYAI_API AQ3AiGridVolume : public AVolume
 	GENERATED_BODY()
 
 public:
-    AQ3AiGridVolume(const FObjectInitializer& ObjectInitializer);
+	AQ3AiGridVolume(const FObjectInitializer& ObjectInitializer);
 
-     virtual void Tick(float DeltaSeconds) override;
-     virtual void PostRenderFor(class APlayerController* PC, class UCanvas* Canvas, FVector CameraPosition, FVector CameraDir) override;
+	virtual void Tick(float DeltaSeconds) override;
+	virtual void PostRenderFor(class APlayerController* PC, class UCanvas* Canvas, FVector CameraPosition, FVector CameraDir) override;
 
-	 void BuildGrid();
+	void BuildGrid();
+
+private:
+	TArray<TArray<int>> Nodes;
 };
