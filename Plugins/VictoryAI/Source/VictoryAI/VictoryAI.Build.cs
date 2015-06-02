@@ -20,5 +20,10 @@ public class VictoryAI : ModuleRules
 				"RHI"
 			}
 		);
+
+        PrivateDependencyModuleNames.AddRange(new string[] { "VictoryAI" });
+        PrivateIncludePathModuleNames.AddRange(new string[] { "VictoryAI" });
+
+        //PublicIncludePaths.AddRange(new string[] { "VictoryAI/Public" });
 	}
 }

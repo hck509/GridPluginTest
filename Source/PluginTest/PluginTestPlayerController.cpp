@@ -3,6 +3,7 @@
 #include "PluginTest.h"
 #include "PluginTestPlayerController.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "Q3AiGridVolume.h"
 
 APluginTestPlayerController::APluginTestPlayerController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -64,16 +65,32 @@ void APluginTestPlayerController::MoveToTouchLocation(const ETouchIndex::Type Fi
 
 void APluginTestPlayerController::SetNewMoveDestination(const FVector DestLocation)
 {
-	APawn* const Pawn = GetPawn();
+	//APawn* const Pawn = GetPawn();
+	//if (Pawn)
+	//{
+	//	UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
+	//	float const Distance = FVector::Dist(DestLocation, Pawn->GetActorLocation());
+
+	//	// We need to issue move command only if far enough in order for walk animation to play correctly
+	//	if (NavSys && (Distance > 120.0f))
+	//	{
+	//		NavSys->SimpleMoveToLocation(this, DestLocation);
+	//	}
+	//}
+
+	APawn* Pawn = GetPawn();
 	if (Pawn)
 	{
-		UNavigationSystem* const NavSys = GetWorld()->GetNavigationSystem();
-		float const Distance = FVector::Dist(DestLocation, Pawn->GetActorLocation());
+		float Distance = FVector::Dist(DestLocation, Pawn->GetActorLocation());
 
 		// We need to issue move command only if far enough in order for walk animation to play correctly
-		if (NavSys && (Distance > 120.0f))
+		if (Distance > 120.0f)
 		{
-			NavSys->SimpleMoveToLocation(this, DestLocation);
+			for (TActorIterator<AQ3AiGridVolume> It(GetWorld()); It; ++It)
+			{
+
+			}
+
 		}
 	}
 }

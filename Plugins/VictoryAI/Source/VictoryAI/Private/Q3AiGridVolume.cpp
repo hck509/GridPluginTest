@@ -43,7 +43,7 @@ void AQ3AiGridVolume::Tick(float DeltaSeconds)
 		}
 	}
 
-	FindPath();
+	FindPathTest();
 }
 
 void AQ3AiGridVolume::PostRenderFor(class APlayerController* PC, class UCanvas* Canvas, FVector CameraPosition, FVector CameraDir)
@@ -141,7 +141,7 @@ void AQ3AiGridVolume::BuildGrid()
 	GridStep = Step;
 }
 
-void AQ3AiGridVolume::FindPath()
+void AQ3AiGridVolume::FindPathTest()
 {
 	FIntPoint StartPoint(0, 0);
 	FIntPoint EndPoint(6, 8);
@@ -162,4 +162,57 @@ void AQ3AiGridVolume::FindPath()
 
 		DrawDebugSolidBox(GetWorld(), NodePosition, FVector(8, 8, 8), FColor(255, 0, 0));
 	}
+}
+
+TArray<FVector> AQ3AiGridVolume::FindPath(const FVector& Start, const FVector& End) const
+{
+	int StartX = FPlatformMath::FloorToInt((Start.X - GridMinX) / GridStep);
+	int StartY = FPlatformMath::FloorToInt((Start.Y - GridMinY) / GridStep);
+	int EndX = FPlatformMath::FloorToInt((End.X - GridMinX) / GridStep);
+	int EndY = FPlatformMath::FloorToInt((End.Y - GridMinY) / GridStep);
+
+	if (StartX < 0 || StartX >= Nodes.Num())
+	{
+		UE_LOG(Q3PathFinding, Error, TEXT("Start X is out of range. X : %d, Range : %d"), StartX, Nodes.Num());
+		return TArray<FVector>();
+	}
+
+	if (StartY < 0 || StartY >= Nodes[0].Num())
+	{
+		UE_LOG(Q3PathFinding, Error, TEXT("Start Y is out of range. Y : %d, Range : %d"), StartY, Nodes[0].Num());
+		return TArray<FVector>();
+	}
+
+	if (EndX < 0 || EndX >= Nodes.Num())
+	{
+		UE_LOG(Q3PathFinding, Error, TEXT("End X is out of range. X : %d, Range : %d"), EndX, Nodes.Num());
+		return TArray<FVector>();
+	}
+
+	if (EndY < 0 || EndY >= Nodes[0].Num())
+	{
+		UE_LOG(Q3PathFinding, Error, TEXT("End Y is out of range. Y : %d, Range : %d"), EndY, Nodes[0].Num());
+		return TArray<FVector>();
+	}
+
+	Q3Graph Graph(Nodes);
+	MicroPanther::MicroPather Panther(&Graph, 250, 6, false);
+
+	int32 TotalCost = 0;
+	MP_VECTOR<void*> Path;
+	Panther.Solve(Graph.Vec2ToState(FIntPoint(StartX, StartY)), Graph.Vec2ToState(FIntPoint(EndX, EndY)), &Path, &TotalCost);
+
+	TArray<FVector> ResultPath;
+
+	for (uint32 i = 0; i < Path.size(); ++i)
+	{
+		FIntPoint Position = Graph.StateToVec2(Path[i]);
+		int Node = Nodes[Position.X][Position.Y];
+
+		FVector NodePosition(GridMinX + (Position.X * GridStep), GridMinY + (Position.Y * GridStep), GridMinZ + Node);
+
+		ResultPath.Add(NodePosition);
+	}
+
+	return ResultPath;
 }
