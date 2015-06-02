@@ -9,8 +9,8 @@
 //////////////////////////////////////////////////////////////////////////
 // UVictoryAIBPLibrary
 
-UVictoryAIBPLibrary::UVictoryAIBPLibrary(const class FPostConstructInitializeProperties& PCIP)
-	: Super(PCIP)
+UVictoryAIBPLibrary::UVictoryAIBPLibrary(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	
 }
