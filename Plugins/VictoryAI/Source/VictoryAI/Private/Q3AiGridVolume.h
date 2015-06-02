@@ -16,11 +16,14 @@ class VICTORYAI_API AQ3AiGridVolume : public AVolume
 public:
 	AQ3AiGridVolume(const FObjectInitializer& ObjectInitializer);
 
+	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void PostRenderFor(class APlayerController* PC, class UCanvas* Canvas, FVector CameraPosition, FVector CameraDir) override;
 
 	void BuildGrid();
+	void FindPath();
 
 private:
+	float GridMinX, GridMinY, GridMinZ, GridStep;
 	TArray<TArray<int>> Nodes;
 };

@@ -48,7 +48,7 @@ distribution.
 #include "micropather.h"
 
 using namespace std;
-using namespace micropather;
+using namespace MicroPanther;
 
 class OpenQueue
 {
@@ -94,7 +94,7 @@ void OpenQueue::Push( PathNode* pNode )
 	
 	// Add sorted. Lowest to highest cost path. Note that the sentinel has
 	// a value of FLT_MAX, so it should always be sorted in.
-	MPASSERT( pNode->totalCost < FLT_MAX );
+	MPASSERT( pNode->totalCost < MAX_int32 );
 	PathNode* iter = sentinel->next;
 	while ( true )
 	{
@@ -425,7 +425,7 @@ PathNode* PathNodePool::FetchPathNode( void* state )
 }
 
 
-PathNode* PathNodePool::GetPathNode( unsigned frame, void* _state, float _costFromStart, float _estToGoal, PathNode* _parent )
+PathNode* PathNodePool::GetPathNode( unsigned frame, void* _state, int32 _costFromStart, int32 _estToGoal, PathNode* _parent )
 {
 	unsigned key = Hash( _state );
 
@@ -453,8 +453,8 @@ PathNode* PathNodePool::GetPathNode( unsigned frame, void* _state, float _costFr
 
 void PathNode::Init(	unsigned _frame,
 						void* _state,
-						float _costFromStart, 
-						float _estToGoal, 
+						int32 _costFromStart, 
+						int32 _estToGoal, 
 						PathNode* _parent )
 {
 	state = _state;
@@ -619,7 +619,7 @@ void MicroPather::GetNodeNeighbors( PathNode* node, MP_VECTOR< NodeCost >* pNode
 			for( unsigned i=0; i<stateCostVecSize; ++i ) {
 				void* state = stateCostVecPtr[i].state;
 				pNodeCostPtr[i].cost = stateCostVecPtr[i].cost;
-				pNodeCostPtr[i].node = pathNodePool.GetPathNode( frame, state, FLT_MAX, FLT_MAX, 0 );
+				pNodeCostPtr[i].node = pathNodePool.GetPathNode( frame, state, MAX_int32, MAX_int32, 0 );
 			}
 
 			// Can this be cached?
@@ -640,7 +640,7 @@ void MicroPather::GetNodeNeighbors( PathNode* node, MP_VECTOR< NodeCost >* pNode
 		for( int i=0; i<node->numAdjacent; ++i ) {
 			PathNode* pNode = pNodeCostPtr[i].node;
 			if ( pNode->frame != frame ) {
-				pNode->Init( frame, pNode->state, FLT_MAX, FLT_MAX, 0 );
+				pNode->Init( frame, pNode->state, MAX_int32, MAX_int32, 0 );
 			}
 		}
 	}
@@ -717,7 +717,7 @@ void PathCache::Reset()
 }
 
 
-void PathCache::Add( const MP_VECTOR< void* >& path, const MP_VECTOR< float >& cost )
+void PathCache::Add( const MP_VECTOR< void* >& path, const MP_VECTOR< int32 >& cost )
 {
 	if ( nItems + (int)path.size() > allocated*3/4 ) {
 		return;
@@ -744,17 +744,17 @@ void PathCache::AddNoSolution( void* end, void* states[], int count )
 	}
 
 	for( int i=0; i<count; ++i ) {
-		Item item = { states[i], end, 0, FLT_MAX };
+		Item item = { states[i], end, 0, MAX_int32 };
 		AddItem( item );
 	}
 }
 
 
-int PathCache::Solve( void* start, void* end, MP_VECTOR< void* >* path, float* totalCost )
+int PathCache::Solve( void* start, void* end, MP_VECTOR< void* >* path, int32* totalCost )
 {
 	const Item* item = Find( start, end );
 	if ( item ) {
-		if ( item->cost == FLT_MAX ) {
+		if ( item->cost == MAX_int32 ) {
 			++hit;
 			return MicroPather::NO_SOLUTION;
 		}
@@ -820,7 +820,7 @@ const PathCache::Item* PathCache::Find( void* start, void* end )
 }
 
 
-void MicroPather::GetCacheData( micropather::CacheData* data )
+void MicroPather::GetCacheData( MicroPanther::CacheData* data )
 {
 	memset( data, 0, sizeof(*data) );
 
@@ -842,7 +842,7 @@ void MicroPather::GetCacheData( micropather::CacheData* data )
 
 
 
-int MicroPather::Solve( void* startNode, void* endNode, MP_VECTOR< void* >* path, float* cost )
+int MicroPather::Solve( void* startNode, void* endNode, MP_VECTOR< void* >* path, int32* cost )
 {
 	// Important to clear() in case the caller doesn't check the return code. There
 	// can easily be a left over path  from a previous call.
@@ -853,10 +853,10 @@ int MicroPather::Solve( void* startNode, void* endNode, MP_VECTOR< void* >* path
 	graph->PrintStateInfo( startNode );
 	printf( " --> " );
 	graph->PrintStateInfo( endNode );
-	printf( " min cost=%f\n", graph->LeastCostEstimate( startNode, endNode ) );
+	printf( " min cost=%d\n", graph->LeastCostEstimate( startNode, endNode ) );
 	#endif
 
-	*cost = 0.0f;
+	*cost = 0;
 
 	if ( startNode == endNode )
 		return START_END_SAME;
@@ -912,11 +912,11 @@ int MicroPather::Solve( void* startNode, void* endNode, MP_VECTOR< void* >* path
 			for( int i=0; i<node->numAdjacent; ++i )
 			{
 				// Not actually a neighbor, but useful. Filter out infinite cost.
-				if ( nodeCostVec[i].cost == FLT_MAX ) {
+				if ( nodeCostVec[i].cost == MAX_int32 ) {
 					continue;
 				}
 				PathNode* child = nodeCostVec[i].node;
-				float newCost = node->costFromStart + nodeCostVec[i].cost;
+				int32 newCost = node->costFromStart + nodeCostVec[i].cost;
 
 				PathNode* inOpen   = child->inOpen ? child : 0;
 				PathNode* inClosed = child->inClosed ? child : 0;
@@ -959,7 +959,7 @@ int MicroPather::Solve( void* startNode, void* endNode, MP_VECTOR< void* >* path
 }	
 
 
-int MicroPather::SolveForNearStates( void* startState, MP_VECTOR< StateCost >* nearCosts, float maxCost )
+int MicroPather::SolveForNearStates( void* startState, MP_VECTOR< StateCost >* nearCosts, int32 maxCost )
 {
 	/*	 http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
 
@@ -993,7 +993,7 @@ int MicroPather::SolveForNearStates( void* startState, MP_VECTOR< StateCost >* n
 
 	PathNode closedSentinel;
 	closedSentinel.Clear();
-	closedSentinel.Init( frame, 0, FLT_MAX, FLT_MAX, 0 );
+	closedSentinel.Init( frame, 0, MAX_int32, MAX_int32, 0 );
 	closedSentinel.next = closedSentinel.prev = &closedSentinel;
 
 	PathNode* newPathNode = pathNodePool.GetPathNode( frame, startState, 0, 0, 0 );
@@ -1012,8 +1012,8 @@ int MicroPather::SolveForNearStates( void* startState, MP_VECTOR< StateCost >* n
 
 		for( int i=0; i<node->numAdjacent; ++i )
 		{
-			MPASSERT( node->costFromStart < FLT_MAX );
-			float newCost = node->costFromStart + nodeCostVec[i].cost;
+			MPASSERT( node->costFromStart < MAX_int32 );
+			int32 newCost = node->costFromStart + nodeCostVec[i].cost;
 
 			PathNode* inOpen   = nodeCostVec[i].node->inOpen ? nodeCostVec[i].node : 0;
 			PathNode* inClosed = nodeCostVec[i].node->inClosed ? nodeCostVec[i].node : 0;

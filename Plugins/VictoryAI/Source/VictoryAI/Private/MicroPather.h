@@ -41,7 +41,7 @@ distribution.
 #define GRINLIZ_NO_STL
 
 #ifdef GRINLIZ_NO_STL
-#	define MP_VECTOR micropather::MPVector
+#	define MP_VECTOR MicroPanther::MPVector
 #else
 #	include <vector>
 #	define MP_VECTOR std::vector
@@ -79,7 +79,7 @@ distribution.
 	typedef unsigned MP_UPTR;
 #endif
 
-namespace micropather
+namespace MicroPanther
 {
 #ifdef GRINLIZ_NO_STL
 
@@ -136,7 +136,7 @@ namespace micropather
 	struct StateCost
 	{
 		void* state;			///< The state as a void*
-		float cost;				///< The cost to the state. Use FLT_MAX for infinite cost.
+		int32 cost;				///< The cost to the state. Use FLT_MAX for infinite cost.
 	};
 
 
@@ -165,7 +165,7 @@ namespace micropather
 			map. If you pathfinding is based on minimum time, it is the minimal travel time 
 			between 2 points given the best possible terrain.
 		*/
-		virtual float LeastCostEstimate( void* stateStart, void* stateEnd ) = 0;
+		virtual int32 LeastCostEstimate( void* stateStart, void* stateEnd ) = 0;
 
 		/** 
 			Return the exact cost from the given state to all its neighboring states. This
@@ -173,7 +173,7 @@ namespace micropather
 			exact values for every call to MicroPather::Solve(). It should generally be a simple,
 			fast function with no callbacks into the pather.
 		*/	
-		virtual void AdjacentCost( void* state, MP_VECTOR< micropather::StateCost > *adjacent ) = 0;
+		virtual void AdjacentCost( void* state, MP_VECTOR< MicroPanther::StateCost > *adjacent ) = 0;
 
 		/**
 			This function is only used in DEBUG mode - it dumps output to stdout. Since void* 
@@ -189,7 +189,7 @@ namespace micropather
 	struct NodeCost
 	{
 		PathNode* node;
-		float cost;
+		int32 cost;
 	};
 
 
@@ -202,8 +202,8 @@ namespace micropather
 	  public:
 		void Init(	unsigned _frame,
 					void* _state,
-					float _costFromStart, 
-					float _estToGoal, 
+					int32 _costFromStart, 
+					int32 _estToGoal, 
 					PathNode* _parent );
 
 		void Clear() {
@@ -213,14 +213,14 @@ namespace micropather
 		}
 		void InitSentinel() {
 			Clear();
-			Init( 0, 0, FLT_MAX, FLT_MAX, 0 );
+			Init( 0, 0, MAX_int32, MAX_int32, 0 );
 			prev = next = this;
 		}	
 
 		void *state;			// the client state
-		float costFromStart;	// exact
-		float estToGoal;		// estimated
-		float totalCost;		// could be a function, but save some math.
+		int32 costFromStart;	// exact
+		int32 estToGoal;		// estimated
+		int32 totalCost;		// could be a function, but save some math.
 		PathNode* parent;		// the parent is used to reconstruct the path
 		unsigned frame;			// unique id for this path, so the solver can distinguish
 								// correct from stale values
@@ -248,7 +248,7 @@ namespace micropather
 		#ifdef DEBUG
 		void CheckList()
 		{
-			MPASSERT( totalCost == FLT_MAX );
+			MPASSERT( totalCost == MAX_int32 );
 			for( PathNode* it = next; it != this; it=it->next ) {
 				MPASSERT( it->prev == this || it->totalCost >= it->prev->totalCost );
 				MPASSERT( it->totalCost <= it->next->totalCost );
@@ -257,10 +257,10 @@ namespace micropather
 		#endif
 
 		void CalcTotalCost() {
-			if ( costFromStart < FLT_MAX && estToGoal < FLT_MAX )
+			if ( costFromStart < MAX_int32 && estToGoal < MAX_int32 )
 				totalCost = costFromStart + estToGoal;
 			else
-				totalCost = FLT_MAX;
+				totalCost = MAX_int32;
 		}
 
 	  private:
@@ -293,8 +293,8 @@ namespace micropather
 		//       parameters are ignored.
 		PathNode* GetPathNode(		unsigned frame,
 									void* _state,
-									float _costFromStart, 
-									float _estToGoal, 
+									int32 _costFromStart, 
+									int32 _estToGoal, 
 									PathNode* _parent );
 
 		// Get a pathnode that is already in the pool.
@@ -365,7 +365,7 @@ namespace micropather
 
 			// Data:
 			void*	next;
-			float	cost;	// from 'start' to 'next'. FLT_MAX if unsolveable.
+			int32	cost;	// from 'start' to 'next'. FLT_MAX if unsolveable.
 
 			unsigned Hash() const {
 				const unsigned char *p = (const unsigned char *)(&start);
@@ -383,9 +383,9 @@ namespace micropather
 		~PathCache();
 		
 		void Reset();
-		void Add( const MP_VECTOR< void* >& path, const MP_VECTOR< float >& cost );
+		void Add( const MP_VECTOR< void* >& path, const MP_VECTOR< int32 >& cost );
 		void AddNoSolution( void* end, void* states[], int count );
-		int Solve( void* startState, void* endState, MP_VECTOR< void* >* path, float* totalCost );
+		int Solve( void* startState, void* endState, MP_VECTOR< void* >* path, int32* totalCost );
 
 		int AllocatedBytes() const { return allocated * sizeof(Item); }
 		int UsedBytes() const { return nItems * sizeof(Item); }
@@ -419,7 +419,7 @@ namespace micropather
 	*/
 	class MicroPather
 	{
-		friend class micropather::PathNode;
+		friend class MicroPanther::PathNode;
 
 	  public:
 		enum
@@ -467,7 +467,7 @@ namespace micropather
 			@param totalCost	Output, the cost of the path, if found.
 			@return				Success or failure, expressed as SOLVED, NO_SOLUTION, or START_END_SAME.
 		*/
-		int Solve( void* startState, void* endState, MP_VECTOR< void* >* path, float* totalCost );
+		int Solve( void* startState, void* endState, MP_VECTOR< void* >* path, int32* totalCost );
 
 		/**
 			Find all the states within a given cost from startState.
@@ -478,7 +478,7 @@ namespace micropather
 								larger 'near' sets and take more time to compute.)
 			@return				Success or failure, expressed as SOLVED or NO_SOLUTION.
 		*/
-		int SolveForNearStates( void* startState, MP_VECTOR< StateCost >* nearCosts, float maxCost );
+		int SolveForNearStates( void* startState, MP_VECTOR< StateCost >* nearCosts, int32 maxCost );
 
 		/** Should be called whenever the cost between states or the connection between states changes.
 			Also frees overhead memory used by MicroPather, and calling will free excess memory.
@@ -504,7 +504,7 @@ namespace micropather
 		PathNodePool			pathNodePool;
 		MP_VECTOR< StateCost >	stateCostVec;	// local to Solve, but put here to reduce memory allocation
 		MP_VECTOR< NodeCost >	nodeCostVec;	// local to Solve, but put here to reduce memory allocation
-		MP_VECTOR< float >		costVec;
+		MP_VECTOR< int32 >		costVec;
 
 		Graph* graph;
 		unsigned frame;						// incremented with every solve, used to determine if cached data needs to be refreshed
