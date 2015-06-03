@@ -7,5 +7,8 @@ public class PluginTest : ModuleRules
 	public PluginTest(TargetInfo Target)
 	{
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
+
+	    PrivateDependencyModuleNames.AddRange(new string[] { "VictoryAI" });
+	    PrivateIncludePathModuleNames.AddRange(new string[] { "VictoryAI" });				
 	}
 }

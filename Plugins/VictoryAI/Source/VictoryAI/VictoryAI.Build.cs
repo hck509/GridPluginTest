@@ -6,13 +6,13 @@ public class VictoryAI : ModuleRules
 {
 	public VictoryAI(TargetInfo Target)
 	{
-		//Private Paths
-        PrivateIncludePaths.AddRange(new string[] { 
-			"VictoryAI/Private"
+        PublicIncludePaths.AddRange(new string[] { 
+			"VictoryAI/Public"
 		});
+
 		
         PublicDependencyModuleNames.AddRange(
-			new string[] { 
+			new string[] {
 				"Core", 
 				"CoreUObject", 
 				"Engine", 
@@ -20,10 +20,5 @@ public class VictoryAI : ModuleRules
 				"RHI"
 			}
 		);
-
-        PrivateDependencyModuleNames.AddRange(new string[] { "VictoryAI" });
-        PrivateIncludePathModuleNames.AddRange(new string[] { "VictoryAI" });
-
-        //PublicIncludePaths.AddRange(new string[] { "VictoryAI/Public" });
 	}
 }
