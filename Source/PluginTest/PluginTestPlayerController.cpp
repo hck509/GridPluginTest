@@ -5,6 +5,7 @@
 #include "AI/Navigation/NavigationSystem.h"
 #include "Q3AiGridVolume.h"
 #include "EngineUtils.h"
+#include "DrawDebugHelpers.h"
 
 APluginTestPlayerController::APluginTestPlayerController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -87,11 +88,22 @@ void APluginTestPlayerController::SetNewMoveDestination(const FVector DestLocati
 		// We need to issue move command only if far enough in order for walk animation to play correctly
 		if (Distance > 120.0f)
 		{
-			for (TActorIterator<AActor> It(GetWorld()); It; ++It)
-			{
+			TArray<FVector> Path;
 
+			for (TActorIterator<AQ3AiGridVolume> It(GetWorld()); It; ++It)
+			{
+				Path = (*It)->FindPath(Pawn->GetActorLocation(), DestLocation);
+
+				if (Path.Num() > 0)
+				{
+					break;
+				}
 			}
 
+			for (const auto& Location : Path)
+			{
+				DrawDebugSolidBox(GetWorld(), Location, FVector(8, 8, 8), FColor(0, 0, 255), false, 3.0f);
+			}
 		}
 	}
 }
