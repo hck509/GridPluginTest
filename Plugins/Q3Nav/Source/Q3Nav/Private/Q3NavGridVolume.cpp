@@ -1,21 +1,21 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Q3NavPrivatePCH.h"
-#include "Q3AiGridVolume.h"
+#include "Q3NavGridVolume.h"
 #include "Q3MicroPanther.h"
 #include "DrawDebugHelpers.h"
 
-AQ3AiGridVolume::AQ3AiGridVolume(const FObjectInitializer& ObjectInitializer) : AVolume(ObjectInitializer)
+AQ3NavGridVolume::AQ3NavGridVolume(const FObjectInitializer& ObjectInitializer) : AVolume(ObjectInitializer)
 {
     PrimaryActorTick.bCanEverTick = true;
 }
 
-void AQ3AiGridVolume::BeginPlay()
+void AQ3NavGridVolume::BeginPlay()
 {
 	BuildGrid();
 }
 
-void AQ3AiGridVolume::Tick(float DeltaSeconds)
+void AQ3NavGridVolume::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
@@ -46,12 +46,12 @@ void AQ3AiGridVolume::Tick(float DeltaSeconds)
 	FindPathTest();
 }
 
-void AQ3AiGridVolume::PostRenderFor(class APlayerController* PC, class UCanvas* Canvas, FVector CameraPosition, FVector CameraDir)
+void AQ3NavGridVolume::PostRenderFor(class APlayerController* PC, class UCanvas* Canvas, FVector CameraPosition, FVector CameraDir)
 {
 
 }
 
-void AQ3AiGridVolume::BuildGrid()
+void AQ3NavGridVolume::BuildGrid()
 {
 	FBoxSphereBounds Bounds = BrushComponent->CalcBounds(BrushComponent->ComponentToWorld);
 	FBox BBox = Bounds.GetBox();
@@ -141,7 +141,7 @@ void AQ3AiGridVolume::BuildGrid()
 	GridStep = Step;
 }
 
-void AQ3AiGridVolume::FindPathTest()
+void AQ3NavGridVolume::FindPathTest()
 {
 	FIntPoint StartPoint(0, 0);
 	FIntPoint EndPoint(6, 8);
@@ -164,7 +164,7 @@ void AQ3AiGridVolume::FindPathTest()
 	}
 }
 
-TArray<FVector> AQ3AiGridVolume::FindPath(const FVector& Start, const FVector& End) const
+TArray<FVector> AQ3NavGridVolume::FindPath(const FVector& Start, const FVector& End) const
 {
 	int StartX = FPlatformMath::FloorToInt((Start.X - GridMinX) / GridStep);
 	int StartY = FPlatformMath::FloorToInt((Start.Y - GridMinY) / GridStep);

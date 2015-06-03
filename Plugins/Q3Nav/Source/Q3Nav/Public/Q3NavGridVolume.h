@@ -3,18 +3,18 @@
 #pragma once
 
 #include "GameFramework/Volume.h"
-#include "Q3AiGridVolume.generated.h"
+#include "Q3NavGridVolume.generated.h"
 
 /**
  *
  */
 UCLASS()
-class Q3NAV_API AQ3AiGridVolume : public AVolume
+class Q3NAV_API AQ3NavGridVolume : public AVolume
 {
 	GENERATED_BODY()
 
 public:
-	AQ3AiGridVolume(const FObjectInitializer& ObjectInitializer);
+	AQ3NavGridVolume(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;

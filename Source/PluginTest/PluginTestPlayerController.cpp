@@ -3,7 +3,7 @@
 #include "PluginTest.h"
 #include "PluginTestPlayerController.h"
 #include "AI/Navigation/NavigationSystem.h"
-#include "Q3AiGridVolume.h"
+#include "Q3NavGridVolume.h"
 #include "EngineUtils.h"
 #include "DrawDebugHelpers.h"
 
@@ -90,7 +90,7 @@ void APluginTestPlayerController::SetNewMoveDestination(const FVector DestLocati
 		{
 			TArray<FVector> Path;
 
-			for (TActorIterator<AQ3AiGridVolume> It(GetWorld()); It; ++It)
+			for (TActorIterator<AQ3NavGridVolume> It(GetWorld()); It; ++It)
 			{
 				Path = (*It)->FindPath(Pawn->GetActorLocation(), DestLocation);
 
