@@ -1,25 +1,23 @@
 {
 	"PluginFileVersion" : 1,
 
-	"FriendlyName" : "Victory AI",
+	"FriendlyName" : "Q3Nav",
 	"Version" : 1,
 	"VersionName" : "1.0",
-	"CreatedBy" : "Rama", 
-	"CreatedByURL" : "https://forums.unrealengine.com/showthread.php?299-Wiki-Code-Tutorials",
+	"CreatedBy" : "MrHwang", 
+	"CreatedByURL" : "",
 	"EngineVersion" : 1579795,
-	"Description" : "Rama's AI BP Nodes and CPP Classes",
-	"Category" : "Victory AI Plugin",
+	"Description" : "Simple grid based AI Navigation System",
+	"Category" : "Q3",
 	"EnabledByDefault" : true,
 	
 	"Modules" :
 	[		
 		{
-			"Name" : "VictoryAI",
+			"Name" : "Q3Nav",
 			"Type" : "Runtime",
 			"LoadingPhase" : "PreDefault",
 			"WhitelistPlatforms" : [ "Win64", "Win32", "Mac" ]
 		},
-
-		
 	]
 }

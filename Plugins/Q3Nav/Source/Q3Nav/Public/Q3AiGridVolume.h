@@ -9,7 +9,7 @@
  *
  */
 UCLASS()
-class VICTORYAI_API AQ3AiGridVolume : public AVolume
+class Q3NAV_API AQ3AiGridVolume : public AVolume
 {
 	GENERATED_BODY()
 

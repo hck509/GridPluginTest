@@ -2,12 +2,12 @@
 
 using UnrealBuildTool;
 
-public class VictoryAI : ModuleRules
+public class Q3Nav : ModuleRules
 {
-	public VictoryAI(TargetInfo Target)
+	public Q3Nav(TargetInfo Target)
 	{
         PublicIncludePaths.AddRange(new string[] { 
-			"VictoryAI/Public"
+			"Q3Nav/Public"
 		});
 
 		

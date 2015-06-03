@@ -12,7 +12,7 @@
  * The public interface to this module.  In most cases, this interface is only public to sibling modules 
  * within this plugin.
  */
-class IVictoryAI : public IModuleInterface
+class IQ3Nav : public IModuleInterface
 {
 
 public:
@@ -23,9 +23,9 @@ public:
 	 *
 	 * @return Returns singleton instance, loading the module on demand if needed
 	 */
-	static inline IVictoryAI& Get()
+	static inline IQ3Nav& Get()
 	{
-		return FModuleManager::LoadModuleChecked< IVictoryAI >( "VictoryAI" );
+		return FModuleManager::LoadModuleChecked< IQ3Nav >( "Q3Nav" );
 	}
 
 	/**
@@ -35,7 +35,7 @@ public:
 	 */
 	static inline bool IsAvailable()
 	{
-		return FModuleManager::Get().IsModuleLoaded( "VictoryAI" );
+		return FModuleManager::Get().IsModuleLoaded( "Q3Nav" );
 	}
 };
 

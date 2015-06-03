@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "VictoryAIPrivatePCH.h"
+#include "Q3NavPrivatePCH.h"
 #include "Q3AiGridVolume.h"
 #include "Q3MicroPanther.h"
 #include "DrawDebugHelpers.h"
@@ -173,25 +173,25 @@ TArray<FVector> AQ3AiGridVolume::FindPath(const FVector& Start, const FVector& E
 
 	if (StartX < 0 || StartX >= Nodes.Num())
 	{
-		UE_LOG(Q3PathFinding, Error, TEXT("Start X is out of range. X : %d, Range : %d"), StartX, Nodes.Num());
+		UE_LOG(Q3Nav, Error, TEXT("Start X is out of range. X : %d, Range : %d"), StartX, Nodes.Num());
 		return TArray<FVector>();
 	}
 
 	if (StartY < 0 || StartY >= Nodes[0].Num())
 	{
-		UE_LOG(Q3PathFinding, Error, TEXT("Start Y is out of range. Y : %d, Range : %d"), StartY, Nodes[0].Num());
+		UE_LOG(Q3Nav, Error, TEXT("Start Y is out of range. Y : %d, Range : %d"), StartY, Nodes[0].Num());
 		return TArray<FVector>();
 	}
 
 	if (EndX < 0 || EndX >= Nodes.Num())
 	{
-		UE_LOG(Q3PathFinding, Error, TEXT("End X is out of range. X : %d, Range : %d"), EndX, Nodes.Num());
+		UE_LOG(Q3Nav, Error, TEXT("End X is out of range. X : %d, Range : %d"), EndX, Nodes.Num());
 		return TArray<FVector>();
 	}
 
 	if (EndY < 0 || EndY >= Nodes[0].Num())
 	{
-		UE_LOG(Q3PathFinding, Error, TEXT("End Y is out of range. Y : %d, Range : %d"), EndY, Nodes[0].Num());
+		UE_LOG(Q3Nav, Error, TEXT("End Y is out of range. Y : %d, Range : %d"), EndY, Nodes[0].Num());
 		return TArray<FVector>();
 	}
 
