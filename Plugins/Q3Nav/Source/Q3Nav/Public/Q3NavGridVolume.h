@@ -5,6 +5,9 @@
 #include "GameFramework/Volume.h"
 #include "Q3NavGridVolume.generated.h"
 
+namespace MicroPanther { class MicroPather; }
+class Q3Graph;
+
 /**
  *
  */
@@ -15,17 +18,55 @@ class Q3NAV_API AQ3NavGridVolume : public AVolume
 
 public:
 	AQ3NavGridVolume(const FObjectInitializer& ObjectInitializer);
+	virtual ~AQ3NavGridVolume();
 
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
-	virtual void PostRenderFor(class APlayerController* PC, class UCanvas* Canvas, FVector CameraPosition, FVector CameraDir) override;
 
 	void BuildGrid();
 	TArray<FVector> FindPath(const FVector& Start, const FVector& End) const;
 
+	void DrawDebug(UCanvas* Canvas, APlayerController*);
+
+	// Debugging
 	void FindPathTest();
 
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual void PostEditMove(bool bFinished) override;
+#endif
+	
 private:
-	float GridMinX, GridMinY, GridMinZ, GridStep;
-	TArray<TArray<int>> Nodes;
+	UPROPERTY()
+	float GridSize;
+
+	UPROPERTY()
+	float GridMinX;
+
+	UPROPERTY()
+	float GridMinY;
+
+	UPROPERTY()
+	float GridMinZ;
+
+	UPROPERTY()
+	float GridStep;
+
+	UPROPERTY()
+	int32 GridCountX;
+
+	UPROPERTY()
+	int32 GridCountY;
+
+	// Heights of each grid cell. index = X + (Y * GridCountX). -1 means blocked.
+	UPROPERTY()
+	TArray<int32> Heights;
+
+	MicroPanther::MicroPather* Panther;
+	Q3Graph* Graph;
+
+#if WITH_EDITORONLY_DATA
+	FDebugDrawDelegate DebugDrawingDelegate;
+	FDelegateHandle DebugDrawingDelegateHandle;
+#endif
 };

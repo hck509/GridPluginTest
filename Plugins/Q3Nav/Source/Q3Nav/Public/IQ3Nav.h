@@ -37,5 +37,7 @@ public:
 	{
 		return FModuleManager::Get().IsModuleLoaded( "Q3Nav" );
 	}
+
+	virtual TArray<FVector> FindPath(UWorld* World, const FVector& StartLocation, const FVector& EndLocation) const = 0;
 };
 

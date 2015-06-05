@@ -1,10 +1,11 @@
 #include "Q3NavPrivatePCH.h"
 #include "Q3MicroPanther.h"
 
-Q3Graph::Q3Graph(const TArray<TArray<int>>& Heights)
-	: Heights(Heights)
-{
 
+Q3Graph::Q3Graph()
+{
+	GridCountX = 0;
+	GridCountY = 0;
 }
 
 int32 Q3Graph::LeastCostEstimate(void* StartState, void* EndState)
@@ -45,40 +46,36 @@ void Q3Graph::AdjacentCost(void* State, MP_VECTOR<MicroPanther::StateCost>* Adja
 	}
 }
 
-void Q3Graph::PrintStateInfo(void* State)
+void Q3Graph::PrintStateInfo(void* /*State*/)
 {
 	// TODO : ...
-	State;
 }
 
 FIntPoint Q3Graph::StateToVec2(void* State) const
 {
-	int ColumnCount = Heights.Num();
 	intptr_t Index = (intptr_t)State;
 
-	return FIntPoint(Index % ColumnCount, Index / ColumnCount);
+	return FIntPoint(Index % GridCountX, Index / GridCountX);
 }
 
 void* Q3Graph::Vec2ToState(const FIntPoint& Position) const
 {
-	int ColumnCount = Heights.Num();
-
-	intptr_t Index = Position.X + (Position.Y * ColumnCount);
+	intptr_t Index = Position.X + (Position.Y * GridCountX);
 
 	return (void*)Index;
 }
 
 int Q3Graph::GetHeight(int32 X, int32 Y) const
 {
-	if (X < 0 || X >= Heights.Num())
+	if (X < 0 || X >= GridCountX)
 	{
 		return -1;
 	}
 
-	if (Y < 0 || Y >= Heights[X].Num())
+	if (Y < 0 || Y >= GridCountY)
 	{
 		return -1;
 	}
 
-	return Heights[X][Y];
+	return Heights[X + (Y * GridCountX)];
 }
