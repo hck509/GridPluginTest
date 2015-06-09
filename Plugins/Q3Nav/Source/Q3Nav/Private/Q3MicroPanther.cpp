@@ -53,6 +53,12 @@ void Q3Graph::PrintStateInfo(void* /*State*/)
 
 FIntPoint Q3Graph::StateToVec2(void* State) const
 {
+	if (GridCountX == 0)
+	{
+		ensure(0);
+		return FIntPoint(0, 0);
+	}
+
 	intptr_t Index = (intptr_t)State;
 
 	return FIntPoint(Index % GridCountX, Index / GridCountX);

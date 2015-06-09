@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Volume.h"
+#include "DebugRenderSceneProxy.h"
 #include "Q3NavGridVolume.generated.h"
 
 namespace MicroPanther { class MicroPather; }
@@ -20,16 +21,15 @@ public:
 	AQ3NavGridVolume(const FObjectInitializer& ObjectInitializer);
 	virtual ~AQ3NavGridVolume();
 
-	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaSeconds) override;
+	virtual void PostLoad() override;
 
 	void BuildGrid();
 	TArray<FVector> FindPath(const FVector& Start, const FVector& End) const;
 
+#if !UE_BUILD_SHIPPING
 	void DrawDebug(UCanvas* Canvas, APlayerController*);
-
-	// Debugging
 	void FindPathTest();
+#endif
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -65,7 +65,7 @@ private:
 	MicroPanther::MicroPather* Panther;
 	Q3Graph* Graph;
 
-#if WITH_EDITORONLY_DATA
+#if !UE_BUILD_SHIPPING
 	FDebugDrawDelegate DebugDrawingDelegate;
 	FDelegateHandle DebugDrawingDelegateHandle;
 #endif

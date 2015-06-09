@@ -12,11 +12,12 @@ DECLARE_CYCLE_STAT(TEXT("Q3NavGridVolume Find Path"), STAT_Q3NavGridVolume_FindP
 
 AQ3NavGridVolume::AQ3NavGridVolume(const FObjectInitializer& ObjectInitializer) : AVolume(ObjectInitializer)
 {
-#if WITH_EDITORONLY_DATA
-    PrimaryActorTick.bCanEverTick = true;
+#if !UE_BUILD_SHIPPING
 	DebugDrawingDelegate = FDebugDrawDelegate::CreateUObject(this, &AQ3NavGridVolume::DrawDebug);
 	DebugDrawingDelegateHandle = UDebugDrawService::Register(TEXT("Navigation"), DebugDrawingDelegate);
 #endif
+
+	GetBrushComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	Graph = new Q3Graph;
 	Panther = new MicroPanther::MicroPather(Graph, 250, 6, false);
@@ -26,25 +27,12 @@ AQ3NavGridVolume::AQ3NavGridVolume(const FObjectInitializer& ObjectInitializer) 
 
 AQ3NavGridVolume::~AQ3NavGridVolume()
 {
-#if WITH_EDITORONLY_DATA
+#if UE_BUILD_SHIPPING
 	UDebugDrawService::Unregister(DebugDrawingDelegateHandle);
 #endif
 
 	delete Panther;
 	delete Graph;
-}
-
-void AQ3NavGridVolume::BeginPlay()
-{
-}
-
-void AQ3NavGridVolume::Tick(float DeltaSeconds)
-{
-    Super::Tick(DeltaSeconds);
-
-	SCOPE_CYCLE_COUNTER(STAT_Q3NavGridVolume);
-
-	//FindPathTest();
 }
 
 void AQ3NavGridVolume::BuildGrid()
@@ -78,7 +66,7 @@ void AQ3NavGridVolume::BuildGrid()
 
 			//DrawDebugLine(GetWorld(), Top, Bottom, FColor(0, 255, 0));
 
-			FCollisionQueryParams CollisionQueryParams;
+			FCollisionQueryParams CollisionQueryParams(true);
 			CollisionQueryParams.AddIgnoredActor(this);
 
 			FCollisionResponseParams CollisionResponseParams;
@@ -99,7 +87,8 @@ void AQ3NavGridVolume::BuildGrid()
 			CollisionResponseParams.CollisionResponse.WorldStatic = ECR_Block;
 
 			FHitResult HitResult;
-			bool bHasCollision = GetWorld()->LineTraceSingle(HitResult, Top, Bottom, ECC_WorldStatic, CollisionQueryParams, CollisionResponseParams);
+			//bool bHasCollision = GetWorld()->LineTraceSingle(HitResult, Top, Bottom, ECC_WorldStatic, CollisionQueryParams, CollisionResponseParams);
+			bool bHasCollision = GetWorld()->LineTraceSingle(HitResult, Top, Bottom, CollisionQueryParams, FCollisionObjectQueryParams(ECC_WorldStatic));
 
 			if (bHasCollision)
 			{
@@ -151,26 +140,6 @@ void AQ3NavGridVolume::BuildGrid()
 	}
 
 	Graph->SetHeights(Heights, GridCountX, GridCountY);
-}
-
-void AQ3NavGridVolume::FindPathTest()
-{
-	FIntPoint StartPoint(0, 0);
-	FIntPoint EndPoint(6, 8);
-
-	int32 TotalCost = 0;
-	MP_VECTOR<void*> Path;
-	Panther->Solve(Graph->Vec2ToState(StartPoint), Graph->Vec2ToState(EndPoint), &Path, &TotalCost);
-
-	for (uint32 i = 0; i < Path.size(); ++i)
-	{
-		FIntPoint Position = Graph->StateToVec2(Path[i]);
-		int Height = Heights[Position.X + (Position.Y * GridCountX)];
-
-		FVector NodePosition(GridMinX + (Position.X * GridStep), GridMinY + (Position.Y * GridStep), GridMinZ + Height);
-
-		DrawDebugSolidBox(GetWorld(), NodePosition, FVector(8, 8, 8), FColor(255, 0, 0));
-	}
 }
 
 TArray<FVector> AQ3NavGridVolume::FindPath(const FVector& Start, const FVector& End) const
@@ -225,6 +194,8 @@ TArray<FVector> AQ3NavGridVolume::FindPath(const FVector& Start, const FVector& 
 	return ResultPath;
 }
 
+#if !UE_BUILD_SHIPPING
+
 void AQ3NavGridVolume::DrawDebug(UCanvas* Canvas, APlayerController*)
 {
 	const bool bVisible = (Canvas && Canvas->SceneView && !!Canvas->SceneView->Family->EngineShowFlags.Navigation);
@@ -274,6 +245,35 @@ void AQ3NavGridVolume::DrawDebug(UCanvas* Canvas, APlayerController*)
 	}
 
 	DrawDebugMesh(GetWorld(), Verts, Indices, FColor(0, 255, 0));
+}
+
+void AQ3NavGridVolume::FindPathTest()
+{
+	FIntPoint StartPoint(0, 0);
+	FIntPoint EndPoint(6, 8);
+
+	int32 TotalCost = 0;
+	MP_VECTOR<void*> Path;
+	Panther->Solve(Graph->Vec2ToState(StartPoint), Graph->Vec2ToState(EndPoint), &Path, &TotalCost);
+
+	for (uint32 i = 0; i < Path.size(); ++i)
+	{
+		FIntPoint Position = Graph->StateToVec2(Path[i]);
+		int Height = Heights[Position.X + (Position.Y * GridCountX)];
+
+		FVector NodePosition(GridMinX + (Position.X * GridStep), GridMinY + (Position.Y * GridStep), GridMinZ + Height);
+
+		DrawDebugSolidBox(GetWorld(), NodePosition, FVector(8, 8, 8), FColor(255, 0, 0));
+	}
+}
+
+#endif
+
+void AQ3NavGridVolume::PostLoad()
+{
+	Super::PostLoad();
+
+	Graph->SetHeights(Heights, GridCountX, GridCountY);
 }
 
 #if WITH_EDITOR
