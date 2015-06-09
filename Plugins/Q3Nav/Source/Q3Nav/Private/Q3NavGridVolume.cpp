@@ -101,7 +101,7 @@ void AQ3NavGridVolume::BuildGrid()
 			{
 				//DrawDebugLine(GetWorld(), Top, Bottom, FColor(0, 255, 0));
 
-				NewHeights[X][Y] = 0;
+				NewHeights[X][Y] = -1;
 			}
 		}
 	}
